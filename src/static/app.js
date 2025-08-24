@@ -105,11 +105,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       activitiesList.appendChild(activityCard);
 
-      // Add option to select dropdown (all original activities, not filtered)
-      const option = document.createElement("option");
-      option.value = name;
-      option.textContent = name;
-      activitySelect.appendChild(option);
+      // (Dropdown population removed from here)
     });
 
     // Show "no results" message if no activities match filter
