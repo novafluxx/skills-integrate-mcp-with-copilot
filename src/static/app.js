@@ -1,8 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
   const activitiesList = document.getElementById("activities-list");
-  const activitySelect = document.getElementById("activity");
   const signupForm = document.getElementById("signup-form");
   const messageDiv = document.getElementById("message");
+  const modal = document.getElementById("registration-modal");
+  const modalActivityName = document.getElementById("modal-activity-name");
+  const closeBtn = document.querySelector(".close-btn");
+  
+  let currentActivity = null;
 
   // Function to fetch activities from API
   async function fetchActivities() {
@@ -45,20 +49,20 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="participants-container">
             ${participantsHTML}
           </div>
+          <button class="register-btn" data-activity="${name}">Register Student</button>
         `;
 
         activitiesList.appendChild(activityCard);
-
-        // Add option to select dropdown
-        const option = document.createElement("option");
-        option.value = name;
-        option.textContent = name;
-        activitySelect.appendChild(option);
       });
 
       // Add event listeners to delete buttons
       document.querySelectorAll(".delete-btn").forEach((button) => {
         button.addEventListener("click", handleUnregister);
+      });
+      
+      // Add event listeners to register buttons
+      document.querySelectorAll(".register-btn").forEach((button) => {
+        button.addEventListener("click", openRegistrationModal);
       });
     } catch (error) {
       activitiesList.innerHTML =
@@ -66,6 +70,33 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Error fetching activities:", error);
     }
   }
+
+  // Modal functionality
+  function openRegistrationModal(event) {
+    const button = event.target;
+    currentActivity = button.getAttribute("data-activity");
+    modalActivityName.textContent = currentActivity;
+    modal.style.display = "block";
+    document.body.style.overflow = "hidden"; // Prevent background scrolling
+  }
+
+  function closeRegistrationModal() {
+    modal.style.display = "none";
+    document.body.style.overflow = ""; // Restore scrolling
+    signupForm.reset();
+    messageDiv.classList.add("hidden");
+    currentActivity = null;
+  }
+
+  // Close modal when clicking the X button
+  closeBtn.addEventListener("click", closeRegistrationModal);
+
+  // Close modal when clicking outside of it
+  window.addEventListener("click", (event) => {
+    if (event.target === modal) {
+      closeRegistrationModal();
+    }
+  });
 
   // Handle unregister functionality
   async function handleUnregister(event) {
@@ -114,13 +145,19 @@ document.addEventListener("DOMContentLoaded", () => {
   signupForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
+    if (!currentActivity) {
+      messageDiv.textContent = "No activity selected";
+      messageDiv.className = "error";
+      messageDiv.classList.remove("hidden");
+      return;
+    }
+
     const email = document.getElementById("email").value;
-    const activity = document.getElementById("activity").value;
 
     try {
       const response = await fetch(
         `/activities/${encodeURIComponent(
-          activity
+          currentActivity
         )}/signup?email=${encodeURIComponent(email)}`,
         {
           method: "POST",
@@ -136,6 +173,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Refresh activities list to show updated participants
         fetchActivities();
+        
+        // Close modal after successful registration
+        setTimeout(() => {
+          closeRegistrationModal();
+        }, 2000);
       } else {
         messageDiv.textContent = result.detail || "An error occurred";
         messageDiv.className = "error";
