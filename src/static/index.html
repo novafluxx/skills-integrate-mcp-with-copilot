@@ -15,6 +15,25 @@
     <main>
       <section id="activities-container">
         <h3>Available Activities</h3>
+        
+        <!-- Filter and Sort Controls -->
+        <div id="filter-sort-controls">
+          <div class="control-group">
+            <label for="search-input">Search activities:</label>
+            <input type="text" id="search-input" placeholder="Type to search by name..." />
+          </div>
+          <div class="control-group">
+            <label for="sort-select">Sort by:</label>
+            <select id="sort-select">
+              <option value="name">Name (A-Z)</option>
+              <option value="name-desc">Name (Z-A)</option>
+              <option value="availability">Most Available</option>
+              <option value="availability-desc">Least Available</option>
+              <option value="schedule">Schedule</option>
+            </select>
+          </div>
+        </div>
+        
         <div id="activities-list">
           <!-- Activities will be loaded here -->
           <p>Loading activities...</p>
